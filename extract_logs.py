@@ -12,7 +12,7 @@ txt_files = [file for file in os.listdir(current_directory) if file.endswith('.t
 
 # Iterate through each .txt file
 for txt_file in txt_files:
-    with open(txt_file, 'r') as file:
+    with open(txt_file, 'r', encoding='utf-8') as file:
         # Read the contents of the file
         file_content = file.read()
         
@@ -21,7 +21,7 @@ for txt_file in txt_files:
         
         # If matches are found, write them to a file named 'bybit.notxt'
         if matches:
-            with open('bybit.notxt', 'a') as bybit_file:
+            with open('bybit.notxt', 'a', encoding='utf-8') as bybit_file:
                 bybit_file.write(f"Links in {txt_file}:\n")
                 for match in matches:
                     bybit_file.write(match + '\n')
