@@ -1,11 +1,7 @@
 import os
-import re
 
 # Get the current directory
 current_directory = os.getcwd()
-
-# Define a regular expression pattern to match links containing "bybit.com"
-pattern = re.compile(r'\b(?:https?://)?(?:www\.)?bybit\.com\S+\b')
 
 # List all .txt files in the current directory
 txt_files = [file for file in os.listdir(current_directory) if file.endswith('.txt')]
@@ -13,16 +9,14 @@ txt_files = [file for file in os.listdir(current_directory) if file.endswith('.t
 # Iterate through each .txt file
 for txt_file in txt_files:
     with open(txt_file, 'r', encoding='utf-8') as file:
-        # Read the contents of the file
-        file_content = file.read()
+        # Read the contents of the file line by line
+        lines = file.readlines()
         
-        # Find all matches of the pattern in the file content
-        matches = pattern.findall(file_content)
-        
-        # If matches are found, write them to a file named 'bybit.notxt'
-        if matches:
-            with open('bybit.notxt', 'a', encoding='utf-8') as bybit_file:
-                bybit_file.write(f"Links in {txt_file}:\n")
-                for match in matches:
-                    bybit_file.write(match + '\n')
-                bybit_file.write('\n')
+        # Open the output file for appending
+        with open('bybit.notxt', 'a', encoding='utf-8') as bybit_file:
+            # Iterate through each line in the file
+            for line in lines:
+                # Search for the presence of "bybit" in the line
+                if "bybit" in line:
+                    # If found, write the line to the output file
+                    bybit_file.write(line)
