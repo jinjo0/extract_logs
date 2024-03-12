@@ -1,22 +1,69 @@
-import os
+package main
 
-# Get the current directory
-current_directory = os.getcwd()
+import (
+    "fmt"
+    "io"
+    "os"
+    "strings"
+)
 
-# List all .txt files in the current directory
-txt_files = [file for file in os.listdir(current_directory) if file.endswith('.txt')]
+func main() {
+    // Get the current directory
+    currentDirectory, err := os.Getwd()
+    if err != nil {
+        fmt.Println("Error getting current directory:", err)
+        return
+    }
 
-# Iterate through each .txt file
-for txt_file in txt_files:
-    with open(txt_file, 'r', encoding='utf-8') as file:
-        # Read the contents of the file line by line
-        lines = file.readlines()
-        
-        # Open the output file for appending
-        with open('bybit.notxt', 'a', encoding='utf-8') as bybit_file:
-            # Iterate through each line in the file
-            for line in lines:
-                # Search for the presence of "bybit" in the line
-                if "bybit" in line:
-                    # If found, write the line to the output file
-                    bybit_file.write(line)
+    // Open the output file for appending
+    outputFile, err := os.OpenFile("data.notxt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+    if err != nil {
+        fmt.Println("Error opening output file:", err)
+        return
+    }
+    defer outputFile.Close()
+
+    // List all .txt files in the current directory
+    files, err := os.ReadDir(currentDirectory)
+    if err != nil {
+        fmt.Println("Error reading directory:", err)
+        return
+    }
+
+    // Iterate through each .txt file
+    for _, file := range files {
+        if strings.HasSuffix(file.Name(), ".txt") {
+            // Open the current .txt file
+            txtFile, err := os.Open(file.Name())
+            if err != nil {
+                fmt.Println("Error opening file:", err)
+                continue
+            }
+            defer txtFile.Close()
+
+            // Create a buffer to read chunks of the file
+            buffer := make([]byte, 4096) // Adjust the buffer size as needed
+            for {
+                // Read a chunk of the file
+                bytesRead, err := txtFile.Read(buffer)
+                if err != nil && err != io.EOF {
+                    fmt.Println("Error reading file:", err)
+                    break
+                }
+                if bytesRead == 0 {
+                    break
+                }
+
+                // Search for the presence of "ohio" in the chunk
+                if strings.Contains(string(buffer[:bytesRead]), "columbus") || strings.Contains(string(buffer[:bytesRead]), "ohio") {
+                    // If found, write the chunk to the output file
+                    _, err := outputFile.Write(buffer[:bytesRead])
+                    if err != nil {
+                        fmt.Println("Error writing to output file:", err)
+                        break
+                    }
+                }
+            }
+        }
+    }
+}
